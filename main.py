@@ -1,6 +1,11 @@
 # import libraries
+import pydotplus
+from sklearn.externals.six import StringIO
 import urllib.request
 import numpy as np
+from sklearn import tree
+from sklearn import neighbors
+from sklearn import ensemble
 import sys
 from bs4 import BeautifulSoup
 from pathlib import Path
@@ -62,7 +67,96 @@ for m in range(1, int(date_end[0])+1):
             data_current_file = data_current_file.replace("\r", "")
             data_current_file = data_current_file.split("\n")
             for i in range(1, len(data_current_file)):
-                data_current_line = data_current_file[i].split(',')
+                data_current_line = data_current_file[i]
+                data_current_line = data_current_line.replace(
+                    "Boston, MA", "Boston MA")
+                data_current_line = data_current_line.replace(
+                    "Berkeley, CA", "Berkeley CA")
+                data_current_line = data_current_line.replace(
+                    "Madison, WI", "Madison WI")
+                data_current_line = data_current_line.replace(
+                    "New York City, NY", "New York City NY")
+                data_current_line = data_current_line.replace(
+                    "Norfolk County, MA", "Norfolk County MA")
+                data_current_line = data_current_line.replace(
+                    "Tempe, AZ", "Tempe AZ")
+                data_current_line = data_current_line.replace(
+                    "Humboldt County, CA", "Humboldt County CA")
+                data_current_line = data_current_line.replace(
+                    "Los Angeles, CA", "Los Angeles CA")
+                data_current_line = data_current_line.replace(
+                    "Maricopa County, AZ", "Maricopa County AZ")
+                data_current_line = data_current_line.replace(
+                    "Orange, CA", "Orange CA")
+                data_current_line = data_current_line.replace(
+                    "San Antonio, TX", "San Antonio TX")
+                data_current_line = data_current_line.replace(
+                    "Placer County, CA", "Placer County CA")
+                data_current_line = data_current_line.replace(
+                    "Sarasota, FL", "Sarasota FL")
+                data_current_line = data_current_line.replace(
+                    "Sonoma County, CA", "Sonoma County CA")
+                data_current_line = data_current_line.replace(
+                    "Umatilla, OR", "Umatilla OR")
+                data_current_line = data_current_line.replace(
+                    "Wake County NC", "Wake County NC")
+                data_current_line = data_current_line.replace(
+                    "Westchester County, NY", "Westchester County NY")
+                data_current_line = data_current_line.replace(
+                    "Lackland, TX", "Lackland TX")
+                data_current_line = data_current_line.replace(
+                    "Omaha, NE", "Omaha NE")
+                data_current_line = data_current_line.replace(
+                    "Travis, CA", "Travis CA")
+                data_current_line = data_current_line.replace(
+                    "Travis, CA", "Travis CA")
+                data_current_line = data_current_line.replace(
+                    "Santa Clara, CA", "Santa Clara CA")
+                data_current_line = data_current_line.replace(
+                    "Seattle, WA", "Seattle WA")
+                data_current_line = data_current_line.replace(
+                    "Chicago, IL", "Chicago IL")
+                data_current_line = data_current_line.replace(
+                    "San Benito, CA", "San Benito CA")
+                data_current_line = data_current_line.replace(
+                    "Toronto, ON", "Toronto ON")
+                data_current_line = data_current_line.replace(
+                    "London, ON", "London ON")
+                data_current_line = data_current_line.replace(
+                    "San Diego County, CA", "San Diego County CA")
+                data_current_line = data_current_line.replace(
+                    "Sacramento County, CA", "Sacramento County CA")
+                data_current_line = data_current_line.replace(
+                    "Montreal, QC", "Montreal QC")
+                data_current_line = data_current_line.replace(
+                    "Snohomish County, WA", "Snohomish County WA")
+                data_current_line = data_current_line.replace(
+                    "Portland, OR", "Portland OR")
+                data_current_line = data_current_line.replace(
+                    "Providence, RI", "Providence RI")
+                data_current_line = data_current_line.replace(
+                    "King County, WA", "King County WA")
+                data_current_line = data_current_line.replace(
+                    "Cook County, IL", "Cook County IL")
+                data_current_line = data_current_line.replace(
+                    "Grafton County, NH", "Grafton County NH")
+                data_current_line = data_current_line.replace(
+                    "Hillsborough, FL", "Hillsborough FL")
+                data_current_line = data_current_line.replace(
+                    "San Mateo, CA", "San Mateo CA")
+                data_current_line = data_current_line.replace(
+                    "Fulton County, GA", "Fulton County GA")
+                data_current_line = data_current_line.replace(
+                    "Washington County, OR", "Washington County OR")
+                data_current_line = data_current_line.replace(
+                    "Wake County, NC", "Wake County NC")
+                data_current_line = data_current_line.replace(
+                    "Orange County, CA", "Orange County CA")
+                data_current_line = data_current_line.replace(
+                    "Contra Costa County, CA", "Contra Costa County CA")
+                data_current_line = data_current_line.replace(
+                    "Ashland, NE", "Ashland NE")
+                data_current_line = data_current_line.split(',')
                 if(data_current_line != [""]):
                     data_table.append(data_current_line)
 
@@ -77,14 +171,81 @@ for m in range(1, int(date_end[0])+1):
                                     data_table[l].append(data_current_line[7])
     print("")
 
+fichier = open("datas.csv", "w")
 for i in range(0, len(data_table)):
     for j in range(0, len(data_table[i])):
+        data_table[i][j] = str(data_table[i][j])
         if(data_table[i][j] == ""):
-            data_table[i][j] = int(0)
+            data_table[i][j] = "0"
+
+    while(len(data_table[i]) != 8):
+        data_table[i].append("0")
     data_table[i][2] = data_table[i][2].replace("-", "")
     data_table[i][2] = data_table[i][2].replace("T", "")
     data_table[i][2] = data_table[i][2].replace(" ", "")
     data_table[i][2] = data_table[i][2].replace("/", "")
-print("Result:")
-print(data_table)
-print(data_table[len(data_table)-1])
+    data_table[i][2] = data_table[i][2].replace(":", "")
+    data_table[i][0] = '0'
+    data_table[i][1] = '0'
+    fichier.write(",".join(data_table[i])+"\n")
+fichier.close()
+
+print("\033[0;37;41m# Downloading finished")
+print("\033[0;37;48m")
+print("\033[0;37;41m# Starting AI")
+print("\033[0;37;48m")
+
+f = open("datas.csv")
+titan = np.loadtxt(f, delimiter=',', skiprows=1)
+
+nombre_test = 160
+test_idx = []
+fin_titan = len(titan)-1
+for i in range(0, nombre_test):
+    test_idx.append(fin_titan-(1*i))
+fin_titan = len(titan)-1
+
+target = titan[:, [3, 4, 5]]
+data = titan[:, [2, 6, 7]]
+
+print(data[1])
+# on retire les donnees qu'on veut tester
+train_target = np.delete(target, test_idx, axis=0)
+train_data = np.delete(data, test_idx, axis=0)
+
+
+# testing data
+test_target = target[test_idx]
+test_data = data[test_idx]
+# create new classifier
+clf = ensemble.RandomForestClassifier(
+    max_depth=10000, n_estimators=10, max_features=3)
+# train on training data
+clf.fit(train_data, train_target)
+print("Classifieur entraine")
+print("")
+# ce que l'on veut
+print("Vraies donnees:")
+print(test_target)
+
+# ce qui est predit
+print("Ce qui est predit:")
+result = clf.predict(test_data)
+print(result)
+
+prediction = 0
+for i in range(0, nombre_test):
+    for x in range(0, 3):
+        prediction = prediction+(abs(result[i][x]-test_target[i][x]))
+print("")
+print("Precision en %")
+print((prediction/(nombre_test*3))*100)
+# visu
+#print("Creation du PDF de visualisation")
+
+#dot_data = StringIO()
+# tree.export_graphviz(clf, out_file=dot_data,
+#                    filled=True, rounded=True,
+#                     impurity=False)
+#graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+# graph.write_pdf("Prediction.pdf")
