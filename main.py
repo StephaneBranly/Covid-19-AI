@@ -3,9 +3,7 @@ import pydotplus
 from sklearn.externals.six import StringIO
 import urllib.request
 import numpy as np
-from sklearn import tree
-from sklearn import neighbors
-from sklearn import ensemble
+from sklearn import linear_model
 import sys
 from bs4 import BeautifulSoup
 from pathlib import Path
@@ -212,7 +210,6 @@ fin_titan = len(titan)-1
 target = titan[:, [3, 4, 5]]
 data = titan[:, [2, 6, 7]]
 
-print(data[1])
 # on retire les donnees qu'on veut tester
 train_target = np.delete(target, test_idx, axis=0)
 train_data = np.delete(data, test_idx, axis=0)
@@ -221,11 +218,17 @@ train_data = np.delete(data, test_idx, axis=0)
 # testing data
 test_target = target[test_idx]
 test_data = data[test_idx]
-# create new classifier
-clf = ensemble.RandomForestClassifier(
-    max_depth=10000, n_estimators=10, max_features=3)
-# train on training data
-clf.fit(train_data, train_target)
+
+# train datas
+n_alphas = 200
+alphas = np.linspace(0, 100, n_alphas)
+
+coefs = []
+for a in alphas:
+    ridge = linear_model.Ridge(alpha=a, fit_intercept=False)
+    ridge.fit(train_data, train_target)
+    coefs.append(ridge.coef_)
+
 print("Classifieur entraine")
 print("")
 # ce que l'on veut
@@ -234,7 +237,7 @@ print(test_target)
 
 # ce qui est predit
 print("Ce qui est predit:")
-result = clf.predict(test_data)
+result = ridge.predict(test_data)
 print(result)
 
 prediction = 0
