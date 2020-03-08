@@ -244,12 +244,3 @@ print("\033[0;37;48m")
 print("Error size")
 for x in range(0, 3):
     print((prediction[x]/(nombre_test*3)))
-# visu
-# print("Creation du PDF de visualisation")
-
-# dot_data = StringIO()
-# tree.export_graphviz(clf, out_file=dot_data,
-#                    filled=True, rounded=True,
-#                     impurity=False)
-# graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
-# graph.write_pdf("Prediction.pdf")
