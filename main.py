@@ -20,6 +20,15 @@ print("\033[0;37;41m#####                       #####")
 print("\033[0;37;48m")
 
 month_days = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+city_list=["Boston, MA","Berkeley, CA","Madison, WI","New York City, NY","Norfolk County, MA","Tempe, AZ",
+                        "Humboldt County, CA","Los Angeles, CA","Maricopa County, AZ","Orange, CA","San Antonio, TX",
+                        "Placer County, CA","Sarasota, FL","Sonoma County, CA","Umatilla, OR","Wake County NC","Westchester County, NY",
+                        "Lackland, TX","Omaha, NE","Travis, CA","Santa Clara, CA","Seattle, WA","Chicago, IL","San Benito, CA",
+                        "Toronto, ON","London, ON", "San Diego County, CA","Sacramento County, CA","Montreal, QC","Snohomish County, WA",
+                        "Portland, OR","Providence, RI","King County, WA","Cook County, IL","Grafton County, NH","Hillsborough, FL", 
+                        "San Mateo, CA","Fulton County, GA", "Washington County, OR","Wake County, NC", "Orange County, CA","Contra Costa County, CA", "Ashland, NE"]                
+                    
+
 
 download = input("Do you want to download data (y/n) ? ")
 if(download == "y"):
@@ -72,95 +81,7 @@ if(download == "y"):
                     for city in city_list:
                         data_current_line = data_current_line.replace(
                         city, city.replace(",",""))
-                    data_current_line = data_current_line.replace(
-                        "Boston, MA", "Boston MA")
-                    data_current_line = data_current_line.replace(
-                        "Berkeley, CA", "Berkeley CA")
-                    data_current_line = data_current_line.replace(
-                        "Madison, WI", "Madison WI")
-                    data_current_line = data_current_line.replace(
-                        "New York City, NY", "New York City NY")
-                    data_current_line = data_current_line.replace(
-                        "Norfolk County, MA", "Norfolk County MA")
-                    data_current_line = data_current_line.replace(
-                        "Tempe, AZ", "Tempe AZ")
-                    data_current_line = data_current_line.replace(
-                        "Humboldt County, CA", "Humboldt County CA")
-                    data_current_line = data_current_line.replace(
-                        "Los Angeles, CA", "Los Angeles CA")
-                    data_current_line = data_current_line.replace(
-                        "Maricopa County, AZ", "Maricopa County AZ")
-                    data_current_line = data_current_line.replace(
-                        "Orange, CA", "Orange CA")
-                    data_current_line = data_current_line.replace(
-                        "San Antonio, TX", "San Antonio TX")
-                    data_current_line = data_current_line.replace(
-                        "Placer County, CA", "Placer County CA")
-                    data_current_line = data_current_line.replace(
-                        "Sarasota, FL", "Sarasota FL")
-                    data_current_line = data_current_line.replace(
-                        "Sonoma County, CA", "Sonoma County CA")
-                    data_current_line = data_current_line.replace(
-                        "Umatilla, OR", "Umatilla OR")
-                    data_current_line = data_current_line.replace(
-                        "Wake County NC", "Wake County NC")
-                    data_current_line = data_current_line.replace(
-                        "Westchester County, NY", "Westchester County NY")
-                    data_current_line = data_current_line.replace(
-                        "Lackland, TX", "Lackland TX")
-                    data_current_line = data_current_line.replace(
-                        "Omaha, NE", "Omaha NE")
-                    data_current_line = data_current_line.replace(
-                        "Travis, CA", "Travis CA")
-                    data_current_line = data_current_line.replace(
-                        "Travis, CA", "Travis CA")
-                    data_current_line = data_current_line.replace(
-                        "Santa Clara, CA", "Santa Clara CA")
-                    data_current_line = data_current_line.replace(
-                        "Seattle, WA", "Seattle WA")
-                    data_current_line = data_current_line.replace(
-                        "Chicago, IL", "Chicago IL")
-                    data_current_line = data_current_line.replace(
-                        "San Benito, CA", "San Benito CA")
-                    data_current_line = data_current_line.replace(
-                        "Toronto, ON", "Toronto ON")
-                    data_current_line = data_current_line.replace(
-                        "London, ON", "London ON")
-                    data_current_line = data_current_line.replace(
-                        "San Diego County, CA", "San Diego County CA")
-                    data_current_line = data_current_line.replace(
-                        "Sacramento County, CA", "Sacramento County CA")
-                    data_current_line = data_current_line.replace(
-                        "Montreal, QC", "Montreal QC")
-                    data_current_line = data_current_line.replace(
-                        "Snohomish County, WA", "Snohomish County WA")
-                    data_current_line = data_current_line.replace(
-                        "Portland, OR", "Portland OR")
-                    data_current_line = data_current_line.replace(
-                        "Providence, RI", "Providence RI")
-                    data_current_line = data_current_line.replace(
-                        "King County, WA", "King County WA")
-                    data_current_line = data_current_line.replace(
-                        "Cook County, IL", "Cook County IL")
-                    data_current_line = data_current_line.replace(
-                        "Grafton County, NH", "Grafton County NH")
-                    data_current_line = data_current_line.replace(
-                        "Hillsborough, FL", "Hillsborough FL")
-                    data_current_line = data_current_line.replace(
-                        "San Mateo, CA", "San Mateo CA")
-                    data_current_line = data_current_line.replace(
-                        "Fulton County, GA", "Fulton County GA")
-                    data_current_line = data_current_line.replace(
-                        "Washington County, OR", "Washington County OR")
-                    data_current_line = data_current_line.replace(
-                        "Wake County, NC", "Wake County NC")
-                    data_current_line = data_current_line.replace(
-                        "Orange County, CA", "Orange County CA")
-                    data_current_line = data_current_line.replace(
-                        "Contra Costa County, CA", "Contra Costa County CA")
-                    data_current_line = data_current_line.replace(
-                        "Ashland, NE", "Ashland NE")
-                    data_current_line = data_current_line.split(',')
+                        data_current_line = data_current_line.split(',')
                     if(data_current_line != [""]):
                         data_table.append(data_current_line)
 
