@@ -173,7 +173,7 @@ if(download == "y"):
                                             data_current_line[7])
         print("")
 
-    fichier = open("datas.csv", "w")
+    fichier = open("datas2.csv", "w")
     for i in range(0, len(data_table)):
         for j in range(0, len(data_table[i])):
             data_table[i][j] = str(data_table[i][j])
@@ -197,10 +197,11 @@ print("\033[0;37;48m")
 print("\033[0;37;41m# Starting AI")
 print("\033[0;37;48m")
 
+
 f = open("datas.csv")
 titan = np.loadtxt(f, delimiter=',', skiprows=1)
 
-nombre_test = 160
+nombre_test = 20
 test_idx = []
 fin_titan = len(titan)-1
 for i in range(0, nombre_test):
@@ -214,45 +215,41 @@ data = titan[:, [2, 6, 7]]
 train_target = np.delete(target, test_idx, axis=0)
 train_data = np.delete(data, test_idx, axis=0)
 
-
 # testing data
 test_target = target[test_idx]
 test_data = data[test_idx]
 
 # train datas
-n_alphas = 200
-alphas = np.linspace(0, 100, n_alphas)
+n_alphas = 20
+alphas = np.logspace(0, 10, n_alphas)
 
 coefs = []
 for a in alphas:
-    ridge = linear_model.Ridge(alpha=a, fit_intercept=False)
+    ridge = linear_model.Ridge(alpha=a, fit_intercept=False, solver="auto")
     ridge.fit(train_data, train_target)
     coefs.append(ridge.coef_)
 
-print("Classifieur entraine")
+print("Regression : ")
 print("")
-# ce que l'on veut
-print("Vraies donnees:")
-print(test_target)
-
-# ce qui est predit
-print("Ce qui est predit:")
 result = ridge.predict(test_data)
-print(result)
+for x in range(0, len(test_target)):
+    print("\033[0;37;42m Real : "+str(test_target[x]) +
+          "   |  \033[0;37;41m AI : "+str(result[x]))
 
-prediction = 0
+prediction = [0, 0, 0]
 for i in range(0, nombre_test):
     for x in range(0, 3):
-        prediction = prediction+(abs(result[i][x]-test_target[i][x]))
-print("")
-print("Precision en %")
-print((prediction/(nombre_test*3))*100)
+        prediction[x] = prediction[x]+(abs(result[i][x]-test_target[i][x]))
+print("\033[0;37;48m")
+print("Error size")
+for x in range(0, 3):
+    print((prediction[x]/(nombre_test*3)))
 # visu
-#print("Creation du PDF de visualisation")
+# print("Creation du PDF de visualisation")
 
-#dot_data = StringIO()
+# dot_data = StringIO()
 # tree.export_graphviz(clf, out_file=dot_data,
 #                    filled=True, rounded=True,
 #                     impurity=False)
-#graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+# graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
 # graph.write_pdf("Prediction.pdf")
