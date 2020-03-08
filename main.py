@@ -19,9 +19,10 @@ print("")
 print("\033[0;37;41m#####                       #####")
 print("\033[0;37;48m")
 
+month_days = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
 download = input("Do you want to download data (y/n) ? ")
 if(download == "y"):
-    month_days = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     date_start = '01-22-2020'
     date_end = input("Write the end data date (day included)(mm-dd-yyyy) : ")
 
@@ -187,12 +188,24 @@ if(download == "y"):
         data_table[i][2] = data_table[i][2].replace(" ", "")
         data_table[i][2] = data_table[i][2].replace("/", "")
         data_table[i][2] = data_table[i][2].replace(":", "")
+        month = data_table[0]*10+data_table[1]
+        day = data_table[2]*10+data_table[3]
+        timestamp = 0
+        for m in range(0, int(month)):
+            if(m+1 == int(month)):
+                timestamp = timestamp+int(day)*60*60*24
+            else:
+                timestamp = timestamp+month_days[m]*60*60*24
+        data_table[i][2] = timestamp
         data_table[i][0] = '0'
         data_table[i][1] = '0'
         fichier.write(",".join(data_table[i])+"\n")
     fichier.close()
 
     print("\033[0;37;41m# Downloading finished")
+
+
+print("Timestamp = "+str(timestamp))
 print("\033[0;37;48m")
 print("\033[0;37;41m# Starting AI")
 print("\033[0;37;48m")
