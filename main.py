@@ -69,6 +69,9 @@ if(download == "y"):
                 data_current_file = data_current_file.split("\n")
                 for i in range(1, len(data_current_file)):
                     data_current_line = data_current_file[i]
+                    for city in city_list:
+                        data_current_line = data_current_line.replace(
+                        city, city.replace(",",""))
                     data_current_line = data_current_line.replace(
                         "Boston, MA", "Boston MA")
                     data_current_line = data_current_line.replace(
@@ -205,7 +208,6 @@ if(download == "y"):
     print("\033[0;37;41m# Downloading finished")
 
 
-print("Timestamp = "+str(timestamp))
 print("\033[0;37;48m")
 print("\033[0;37;41m# Starting AI")
 print("\033[0;37;48m")
