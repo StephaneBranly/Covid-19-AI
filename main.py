@@ -7,6 +7,7 @@ from sklearn import linear_model
 import sys
 from bs4 import BeautifulSoup
 from pathlib import Path
+import re
 
 import requests
 
@@ -20,7 +21,7 @@ print("\033[0;37;41m#####                       #####")
 print("\033[0;37;48m")
 
 month_days = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-city_list=["Boston, MA","Berkeley, CA","Madison, WI","New York City, NY","Norfolk County, MA","Tempe, AZ",
+city_list=["Boston, MA","Queens County, NY", "Grant County, WA","Fort Bend County, TX","Clark County, NV", "San Francisco County, CA", "Harris County, TX", "Bergen County, NJ", "Berkeley, CA","Madison, WI","New York City, NY","Norfolk County, MA","Tempe, AZ",
                         "Humboldt County, CA","Los Angeles, CA","Maricopa County, AZ","Orange, CA","San Antonio, TX",
                         "Placer County, CA","Sarasota, FL","Sonoma County, CA","Umatilla, OR","Wake County NC","Westchester County, NY",
                         "Lackland, TX","Omaha, NE","Travis, CA","Santa Clara, CA","Seattle, WA","Chicago, IL","San Benito, CA",
@@ -78,10 +79,15 @@ if(download == "y"):
                 data_current_file = data_current_file.split("\n")
                 for i in range(1, len(data_current_file)):
                     data_current_line = data_current_file[i]
-                    for city in city_list:
-                        data_current_line = data_current_line.replace(
-                        city, city.replace(",",""))
-                        data_current_line = data_current_line.split(',')
+                    #for city in city_list:
+                    #    data_current_line = ''.join(data_current_line).replace(city, city.replace(",",""))
+                    match1 = re.match(r'([a-zA-Z0-9_()",.\s]+)(,US|, US|,Canada|, Canada)',''.join(data_current_line))
+                    if match1:
+                        data_current_line=''.join(data_current_line).replace(str(match1.group(1)), str(match1.group(1)).replace(", ",""))
+                    data_current_line = data_current_line.replace("Korea, South","Korea South")
+                    data_current_line = data_current_line.replace("Gambia, The","Gambia The")
+                    data_current_line = data_current_line.replace("Bahamas, The","Bahamas The")
+                    data_current_line = data_current_line.split(',')
                     if(data_current_line != [""]):
                         data_table.append(data_current_line)
 
@@ -100,6 +106,7 @@ if(download == "y"):
 
     fichier = open("datas2.csv", "w")
     for i in range(0, len(data_table)):
+        print("Voici la ligne :"+str(data_table[i]))
         for j in range(0, len(data_table[i])):
             data_table[i][j] = str(data_table[i][j])
             if(data_table[i][j] == ""):
@@ -107,20 +114,28 @@ if(download == "y"):
 
         while(len(data_table[i]) != 8):
             data_table[i].append("0")
-        data_table[i][2] = data_table[i][2].replace("-", "")
-        data_table[i][2] = data_table[i][2].replace("T", "")
-        data_table[i][2] = data_table[i][2].replace(" ", "")
-        data_table[i][2] = data_table[i][2].replace("/", "")
-        data_table[i][2] = data_table[i][2].replace(":", "")
-        month = data_table[0]*10+data_table[1]
-        day = data_table[2]*10+data_table[3]
+        date=str(data_table[i][2])
+        match1 = re.search(r'(\d+/\d+/\d+)',date)
+        match2 = re.search(r'(\d+-\d+-\d+)',date)
+        if match1:
+            match1=match1.group(1).split("/")
+            day=int(match1[1])
+            month=int(match1[0])
+        elif match2:
+            match2= match2.group(1).split("-")
+            day=int(match2[0])
+            month=int(match2[1])
+        else:
+            print("Pas de match pour i ="+str(i))
+            day=1
+            month=1
         timestamp = 0
         for m in range(0, int(month)):
             if(m+1 == int(month)):
                 timestamp = timestamp+int(day)*60*60*24
             else:
                 timestamp = timestamp+month_days[m]*60*60*24
-        data_table[i][2] = timestamp
+        data_table[i][2] = str(timestamp)
         data_table[i][0] = '0'
         data_table[i][1] = '0'
         fichier.write(",".join(data_table[i])+"\n")
