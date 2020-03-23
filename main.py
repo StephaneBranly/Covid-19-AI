@@ -1,6 +1,6 @@
 # import libraries
-import pydotplus
-from sklearn.externals.six import StringIO
+import matplotlib.pyplot as plt
+
 import urllib.request
 import numpy as np
 from sklearn import linear_model
@@ -8,7 +8,6 @@ import sys
 from bs4 import BeautifulSoup
 from pathlib import Path
 import re
-
 import requests
 
 print("\033[0;37;41m#####      Covid-19-AI      #####")
@@ -21,15 +20,6 @@ print("\033[0;37;41m#####                       #####")
 print("\033[0;37;48m")
 
 month_days = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-city_list=["Boston, MA","Queens County, NY", "Grant County, WA","Fort Bend County, TX","Clark County, NV", "San Francisco County, CA", "Harris County, TX", "Bergen County, NJ", "Berkeley, CA","Madison, WI","New York City, NY","Norfolk County, MA","Tempe, AZ",
-                        "Humboldt County, CA","Los Angeles, CA","Maricopa County, AZ","Orange, CA","San Antonio, TX",
-                        "Placer County, CA","Sarasota, FL","Sonoma County, CA","Umatilla, OR","Wake County NC","Westchester County, NY",
-                        "Lackland, TX","Omaha, NE","Travis, CA","Santa Clara, CA","Seattle, WA","Chicago, IL","San Benito, CA",
-                        "Toronto, ON","London, ON", "San Diego County, CA","Sacramento County, CA","Montreal, QC","Snohomish County, WA",
-                        "Portland, OR","Providence, RI","King County, WA","Cook County, IL","Grafton County, NH","Hillsborough, FL", 
-                        "San Mateo, CA","Fulton County, GA", "Washington County, OR","Wake County, NC", "Orange County, CA","Contra Costa County, CA", "Ashland, NE"]                
-                    
-
 
 download = input("Do you want to download data (y/n) ? ")
 if(download == "y"):
@@ -72,7 +62,7 @@ if(download == "y"):
 
             if(d == day_end and m == int(date_end[0])):
                 is_last_file = True
-
+                last_file_size= len(data_current_file)
             if(soup != ""):
                 data_current_file = str(soup)
                 data_current_file = data_current_file.replace("\r", "")
@@ -104,9 +94,8 @@ if(download == "y"):
                                             data_current_line[7])
         print("")
 
-    fichier = open("datas2.csv", "w")
+    fichier = open("datas3.csv", "w")
     for i in range(0, len(data_table)):
-        print("Voici la ligne :"+str(data_table[i]))
         for j in range(0, len(data_table[i])):
             data_table[i][j] = str(data_table[i][j])
             if(data_table[i][j] == ""):
@@ -123,7 +112,7 @@ if(download == "y"):
             month=int(match1[0])
         elif match2:
             match2= match2.group(1).split("-")
-            day=int(match2[0])
+            day=int(match2[2])
             month=int(match2[1])
         else:
             print("Pas de match pour i ="+str(i))
@@ -136,20 +125,39 @@ if(download == "y"):
             else:
                 timestamp = timestamp+month_days[m]*60*60*24
         data_table[i][2] = str(timestamp)
-        data_table[i][0] = '0'
-        data_table[i][1] = '0'
+        data_table[i][0] = "\""+data_table[i][0].replace("\"","")+"\""
+        data_table[i][1] = "\""+data_table[i][1].replace("\"","")+"\""
+        #data_table[i][0] = 0
+        #data_table[i][1] = 0
         fichier.write(",".join(data_table[i])+"\n")
     fichier.close()
 
     print("\033[0;37;41m# Downloading finished")
+    print("\033[0;37;48m")
+    print("\033[0;37;41m# Dividing in multiple files")
+    print("\033[0;37;48m")
+    i=len(data_table)-1
+    last_timestamp=data_table[i][2]
+    while(i>0 and i>= len(data_table)-2-last_file_size):
+        city_file_name="places"+"/"+str(data_table[i][0]).replace("\"","")+"_"+str(data_table[i][1]).replace("\"","")
+        city_file_name=city_file_name.replace("*","")
+        city_file_name=city_file_name.replace(" ","_")
+        fichier = open(city_file_name+".csv", "w")
+        for j in range(0,i+1):
+            if(data_table[j][0] == data_table[i][0] and data_table[j][1] == data_table[i][1]):
+                data_table[j][0] = "0"
+                data_table[j][1] = "0"
+                fichier.write(",".join(data_table[j])+"\n")
+        fichier.close()
+        i=i-1
 
 
 print("\033[0;37;48m")
 print("\033[0;37;41m# Starting AI")
 print("\033[0;37;48m")
+place = input("Write place's name   ")
 
-
-f = open("datas.csv")
+f = open("places/"+place+".csv")
 titan = np.loadtxt(f, delimiter=',', skiprows=1)
 
 nombre_test = 20
@@ -162,36 +170,66 @@ fin_titan = len(titan)-1
 target = titan[:, [3, 4, 5]]
 data = titan[:, [2, 6, 7]]
 
-# on retire les donnees qu'on veut tester
-train_target = np.delete(target, test_idx, axis=0)
-train_data = np.delete(data, test_idx, axis=0)
+if 0:
+    # on retire les donnees qu'on veut tester
+    train_target = np.delete(target, test_idx, axis=0)
+    train_data = np.delete(data, test_idx, axis=0)
 
-# testing data
-test_target = target[test_idx]
-test_data = data[test_idx]
+    # testing data
+    test_target = target[test_idx]
+    test_data = data[test_idx]
 
-# train datas
-n_alphas = 20
-alphas = np.logspace(0, 10, n_alphas)
+    # train datas
+    n_alphas = 20
+    alphas = np.logspace(0, 10, n_alphas)
 
-coefs = []
-for a in alphas:
-    ridge = linear_model.Ridge(alpha=a, fit_intercept=False, solver="auto")
-    ridge.fit(train_data, train_target)
-    coefs.append(ridge.coef_)
+    coefs = []
+    for a in alphas:
+        ridge = linear_model.Ridge(alpha=a, fit_intercept=False, solver="auto")
+        ridge.fit(train_data, train_target)
+        coefs.append(ridge.coef_)
 
-print("Regression : ")
-print("")
-result = ridge.predict(test_data)
-for x in range(0, len(test_target)):
-    print("\033[0;37;42m Real : "+str(test_target[x]) +
-          "   |  \033[0;37;41m AI : "+str(result[x]))
+    print("Regression : ")
+    print("")
+    result = ridge.predict(test_data)
+    for x in range(0, len(test_target)):
+        print("\033[0;37;42m Real : "+str(test_target[x]) +
+            "   |  \033[0;37;41m AI : "+str(result[x]))
 
-prediction = [0, 0, 0]
-for i in range(0, nombre_test):
+    prediction = [0, 0, 0]
+    for i in range(0, nombre_test):
+        for x in range(0, 3):
+            prediction[x] = prediction[x]+(abs(result[i][x]-test_target[i][x]))
+    print("\033[0;37;48m")
+    print("Error size")
     for x in range(0, 3):
-        prediction[x] = prediction[x]+(abs(result[i][x]-test_target[i][x]))
-print("\033[0;37;48m")
-print("Error size")
-for x in range(0, 3):
-    print((prediction[x]/(nombre_test*3)))
+        print((prediction[x]/(nombre_test*3)))
+
+
+
+fig, ax = plt.subplots()
+ax.scatter(titan[:,7], titan[:,6], c=titan[:,3], s=titan[:,3], alpha=0.5)
+
+ax.set_xlabel(r'longitude', fontsize=15)
+ax.set_ylabel(r'latitude', fontsize=15)
+ax.set_title('Planisphere')
+
+ax.grid(True)
+fig.tight_layout()
+
+
+plt.show()
+
+
+y = np.vstack([titan[:,3], titan[:,4], titan[:,5]])
+
+labels = ["Contaminé ", "Morts", "Guéris"]
+
+
+fig, axs = plt.subplots(1, 1, figsize=(2, 2), sharey=True)
+axs.plot(titan[:,2], titan[:,3], label='Contaminés')
+axs.plot(titan[:,2], titan[:,4], label='Morts')
+axs.plot(titan[:,2], titan[:,5], label='Guéris')
+axs.legend()
+plt.show()
+
