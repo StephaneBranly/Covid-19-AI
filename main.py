@@ -1,5 +1,6 @@
 # import libraries
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 import urllib.request
 import numpy as np
@@ -94,7 +95,7 @@ if(download == "y"):
                                             data_current_line[7])
         print("")
 
-    fichier = open("datas3.csv", "w")
+    fichier = open("datas.csv", "w")
     for i in range(0, len(data_table)):
         for j in range(0, len(data_table[i])):
             data_table[i][j] = str(data_table[i][j])
@@ -155,10 +156,19 @@ if(download == "y"):
 print("\033[0;37;48m")
 print("\033[0;37;41m# Starting AI")
 print("\033[0;37;48m")
-place = input("Write place's name   ")
+#place = input("Write place's name   ")
+place1 = "France_France"
+place2 = "0_Italy"
+place3 = "0_Spain"
 
-f = open("places/"+place+".csv")
-titan = np.loadtxt(f, delimiter=',', skiprows=1)
+f_place1 = open("places/"+place1+".csv")
+f_place2 = open("places/"+place2+".csv")
+f_place3 = open("places/"+place3+".csv")
+f_int = open("datas.csv")
+place1_tab = np.loadtxt(f_place1, delimiter=',', skiprows=0)
+place2_tab = np.loadtxt(f_place2, delimiter=',', skiprows=0)
+place3_tab = np.loadtxt(f_place3, delimiter=',', skiprows=0)
+titan = np.loadtxt(f_int, delimiter=',', skiprows=0, usecols=[2,3,4,5,6,7])
 
 nombre_test = 20
 test_idx = []
@@ -167,8 +177,8 @@ for i in range(0, nombre_test):
     test_idx.append(fin_titan-(1*i))
 fin_titan = len(titan)-1
 
-target = titan[:, [3, 4, 5]]
-data = titan[:, [2, 6, 7]]
+target = titan[:, [1, 2, 3]]
+data = titan[:, [0, 4, 5]]
 
 if 0:
     # on retire les donnees qu'on veut tester
@@ -206,30 +216,55 @@ if 0:
         print((prediction[x]/(nombre_test*3)))
 
 
-
-fig, ax = plt.subplots()
-ax.scatter(titan[:,7], titan[:,6], c=titan[:,3], s=titan[:,3], alpha=0.5)
-
-ax.set_xlabel(r'longitude', fontsize=15)
-ax.set_ylabel(r'latitude', fontsize=15)
-ax.set_title('Planisphere')
-
-ax.grid(True)
-fig.tight_layout()
-
-
-plt.show()
-
-
-y = np.vstack([titan[:,3], titan[:,4], titan[:,5]])
-
 labels = ["Contaminé ", "Morts", "Guéris"]
 
 
-fig, axs = plt.subplots(1, 1, figsize=(2, 2), sharey=True)
-axs.plot(titan[:,2], titan[:,3], label='Contaminés')
-axs.plot(titan[:,2], titan[:,4], label='Morts')
-axs.plot(titan[:,2], titan[:,5], label='Guéris')
-axs.legend()
+
+fig = plt.figure(constrained_layout=True)
+
+gs = GridSpec(3, 3, figure=fig)
+ax1 = fig.add_subplot(gs[0, :])
+ax2 = fig.add_subplot(gs[1:, 0])
+ax3 = fig.add_subplot(gs[1:, 1])
+ax4 = fig.add_subplot(gs[1:, 2])
+
+
+titan[:,1]=np.log(titan[:,1])
+
+ax1.scatter(titan[:,5], titan[:,4], c=titan[:,1], s=titan[:,1], alpha=0.5)
+
+ax1.set_xlabel(r'longitude', fontsize=9)
+ax1.set_ylabel(r'latitude', fontsize=9)
+ax1.set_title('planisphere')
+ax1.set_xlim(-180,180)
+ax1.set_ylim(-90,90)
+ax1.grid(True)
+
+ax2.plot(place1_tab[:,2], place1_tab[:,3], label='Contaminés')
+ax2.plot(place1_tab[:,2], place1_tab[:,4], label='Morts')
+ax2.plot(place1_tab[:,2], place1_tab[:,5], label='Guéris')
+ax2.set_xlabel(r'temps', fontsize=9)
+ax2.set_title(place1)
+ax2.set_ylim(0,100000)
+ax2.legend()
+
+ax3.plot(place2_tab[:,2], place2_tab[:,3], label='Contaminés')
+ax3.plot(place2_tab[:,2], place2_tab[:,4], label='Morts')
+ax3.plot(place2_tab[:,2], place2_tab[:,5], label='Guéris')
+ax3.set_xlabel(r'temps', fontsize=9)
+ax3.set_title(place2)
+ax3.set_ylim(0,100000)
+ax3.legend()
+
+ax4.plot(place3_tab[:,2], place3_tab[:,3], label='Contaminés')
+ax4.plot(place3_tab[:,2], place3_tab[:,4], label='Morts')
+ax4.plot(place3_tab[:,2], place3_tab[:,5], label='Guéris')
+ax4.set_xlabel(r'temps', fontsize=9)
+ax4.set_title(place3)
+ax4.set_ylim(0,100000)
+ax4.legend()
+
+fig.suptitle("Covid-19-AI")
+
 plt.show()
 
